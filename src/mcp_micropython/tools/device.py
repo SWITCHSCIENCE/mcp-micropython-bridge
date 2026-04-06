@@ -113,3 +113,87 @@ def register(mcp: FastMCP, manager: SerialManager) -> None:
             return "✓ リセットしました。再接続するには micropython_connect を使用してください。"
         except Exception as e:
             return f"リセット失敗: {e}"
+
+    @mcp.tool()
+    def micropython_interrupt() -> str:
+        """Ctrl-C を送って実行中の処理を中断する。"""
+        try:
+            manager.interrupt()
+            return "✓ Ctrl-C を送信しました。"
+        except Exception as e:
+            return f"中断失敗: {e}"
+
+    @mcp.tool()
+    def micropython_serial_read(
+        duration: float,
+        idle_timeout: float | None = None,
+        max_bytes: int | None = None,
+    ) -> dict:
+        try:
+            result = manager.serial_read(
+                duration=duration,
+                idle_timeout=idle_timeout,
+                max_bytes=max_bytes,
+            )
+            return {
+                "stdout": result["stdout"],
+                "truncated": result["truncated"],
+                "bytes_read": result["bytes_read"],
+            }
+        except Exception as e:
+            return {
+                "stdout": "",
+                "truncated": False,
+                "bytes_read": 0,
+                "error": str(e),
+            }
+
+    @mcp.tool()
+    def micropython_serial_read_until(
+        pattern: str,
+        timeout: float,
+        max_bytes: int | None = None,
+    ) -> dict:
+        try:
+            result = manager.serial_read_until(
+                pattern=pattern,
+                timeout=timeout,
+                max_bytes=max_bytes,
+            )
+            return {
+                "matched": result["matched"],
+                "stdout": result["stdout"],
+                "bytes_read": result["bytes_read"],
+            }
+        except Exception as e:
+            return {
+                "matched": False,
+                "stdout": "",
+                "bytes_read": 0,
+                "error": str(e),
+            }
+
+    @mcp.tool()
+    def micropython_reset_and_capture(
+        capture_duration: float,
+        idle_timeout: float | None = None,
+        max_bytes: int | None = None,
+    ) -> dict:
+        try:
+            result = manager.reset_and_capture(
+                capture_duration=capture_duration,
+                idle_timeout=idle_timeout,
+                max_bytes=max_bytes,
+            )
+            return {
+                "stdout": result["stdout"],
+                "reset_ok": result["reset_ok"],
+                "truncated": result["truncated"],
+            }
+        except Exception as e:
+            return {
+                "stdout": "",
+                "reset_ok": False,
+                "truncated": False,
+                "error": str(e),
+            }

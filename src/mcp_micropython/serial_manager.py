@@ -11,6 +11,7 @@ MicroPython ボードとの USB Serial 接続を管理する。
 from __future__ import annotations
 
 import threading
+import time
 from contextlib import contextmanager
 from typing import Generator
 
@@ -93,6 +94,66 @@ class SerialManager:
     def port_name(self) -> str | None:
         return self._ser.port if self._ser else None
 
+    def serial_read(
+        self,
+        duration: float,
+        idle_timeout: float | None = None,
+        max_bytes: int | None = None,
+    ) -> dict[str, object]:
+        with self._lock:
+            self._ensure_connected()
+            return self._read_serial(
+                timeout=duration,
+                idle_timeout=idle_timeout,
+                max_bytes=max_bytes,
+            )
+
+    def serial_read_until(
+        self,
+        pattern: str,
+        timeout: float,
+        max_bytes: int | None = None,
+    ) -> dict[str, object]:
+        with self._lock:
+            self._ensure_connected()
+            return self._read_serial(
+                timeout=timeout,
+                max_bytes=max_bytes,
+                pattern=pattern.encode("utf-8"),
+            )
+
+    def reset_and_capture(
+        self,
+        capture_duration: float,
+        idle_timeout: float | None = None,
+        max_bytes: int | None = None,
+    ) -> dict[str, object]:
+        with self._lock:
+            self._ensure_connected()
+            assert self._ser is not None
+            reset_ok = True
+            try:
+                self._ser.reset_input_buffer()
+                self._ser.write(b"\x04")
+                self._ser.flush()
+            except Exception:
+                reset_ok = False
+
+            result = self._read_serial(
+                timeout=capture_duration,
+                idle_timeout=idle_timeout,
+                max_bytes=max_bytes,
+            )
+            result["reset_ok"] = reset_ok
+            return result
+
+    def interrupt(self) -> None:
+        with self._lock:
+            self._ensure_connected()
+            assert self._ser is not None
+            self._ser.write(b"\x03")
+            self._ser.flush()
+
     # ------------------------------------------------------------------
     # コード実行 (Raw REPL 経由)
     # ------------------------------------------------------------------
@@ -154,3 +215,60 @@ class SerialManager:
             raise NotConnectedError(
                 "MicroPython ボードに接続されていません。micropython_connect ツールで接続してください。"
             )
+
+    def _read_serial(
+        self,
+        timeout: float,
+        idle_timeout: float | None = None,
+        max_bytes: int | None = None,
+        pattern: bytes | None = None,
+    ) -> dict[str, object]:
+        if timeout < 0:
+            raise ValueError("timeout must be >= 0")
+        if idle_timeout is not None and idle_timeout < 0:
+            raise ValueError("idle_timeout must be >= 0")
+        if max_bytes is not None and max_bytes <= 0:
+            raise ValueError("max_bytes must be > 0")
+
+        assert self._ser is not None
+
+        deadline = time.monotonic() + timeout
+        last_data_at: float | None = None
+        buffer = bytearray()
+        matched = False
+        truncated = False
+
+        while time.monotonic() < deadline:
+            if idle_timeout is not None and last_data_at is not None:
+                if time.monotonic() - last_data_at >= idle_timeout:
+                    break
+
+            chunk = self._ser.read(self._ser.in_waiting or 1)
+            if not chunk:
+                continue
+
+            if max_bytes is not None:
+                remaining = max_bytes - len(buffer)
+                if remaining <= 0:
+                    truncated = True
+                    break
+                if len(chunk) > remaining:
+                    buffer.extend(chunk[:remaining])
+                    truncated = True
+                    break
+
+            buffer.extend(chunk)
+            last_data_at = time.monotonic()
+
+            if pattern is not None and pattern in buffer:
+                matched = True
+                break
+
+        result: dict[str, object] = {
+            "stdout": buffer.decode("utf-8", errors="replace"),
+            "bytes_read": len(buffer),
+            "truncated": truncated,
+        }
+        if pattern is not None:
+            result["matched"] = matched
+        return result
