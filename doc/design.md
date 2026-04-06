@@ -110,10 +110,6 @@ MicroPython REPLには以下の2つのモードがある：
 │           ├── execution.py   # exec/eval ツール
 │           ├── filesystem.py  # ファイル操作ツール
 │           └── device.py      # デバイス情報・接続管理ツール
-├── tests/
-│   ├── test_serial_manager.py
-│   ├── test_raw_repl.py
-│   └── fixtures/             # モックレスポンス
 └── claude_desktop_config_example.json   # Claude Desktop設定例
 ```
 
@@ -146,28 +142,28 @@ MicroPython REPLには以下の2つのモードがある：
 ## 実装フェーズ
 
 ### Phase 1: 基盤（シリアル通信）
-- [ ] `serial_manager.py`: ポート検索・接続・切断
-- [ ] `raw_repl.py`: Raw REPLモードでのコード送受信
+- [x] `serial_manager.py`: ポート検索・接続・切断
+- [x] `raw_repl.py`: Raw REPLモードでのコード送受信
 - [ ] 単体テスト（実機なしでもモックで動作確認）
 
 ### Phase 2: MCPサーバー骨格
-- [ ] `server.py`: MCPサーバーの起動・ツール登録
-- [ ] `esp32_connect` / `esp32_disconnect` / `esp32_list_ports` ツール
-- [ ] Claude Desktopで接続確認
+- [x] `server.py`: MCPサーバーの起動・ツール登録
+- [x] `micropython_connect` / `micropython_disconnect` / `micropython_list_ports` ツール
+- [x] Claude Desktopで接続確認
 
 ### Phase 3: 実行ツール
-- [ ] `esp32_exec`: コードブロック実行
-- [ ] `esp32_eval`: 式評価
-- [ ] `esp32_get_info`: デバイス情報取得
+- [x] `micropython_exec`: コードブロック実行
+- [x] `micropython_eval`: 式評価
+- [x] `micropython_get_info`: デバイス情報取得
 
 ### Phase 4: ファイルシステムツール
-- [ ] `esp32_list_files`
-- [ ] `esp32_read_file` / `esp32_write_file` / `esp32_delete_file`
+- [x] `micropython_list_files`
+- [x] `micropython_read_file` / `micropython_write_file` / `micropython_delete_file`
 
 ### Phase 5: 品質・UX
 - [ ] タイムアウト・エラーハンドリングの強化
 - [ ] 自動再接続
-- [ ] ドキュメント整備
+- [x] ドキュメント整備
 
 ---
 
@@ -175,7 +171,7 @@ MicroPython REPLには以下の2つのモードがある：
 
 | 項目 | 内容 |
 |---|---|
-| 文字コード | ESP32からのレスポンスはUTF-8だが、バイナリファイルは別対応が必要 |
+| 文字コード | MicroPythonボードからのレスポンスはUTF-8だが、バイナリファイルは別対応が必要 |
 | 大きなファイル転送 | `write_file`でファイルが大きい場合は分割送信が必要（REPLの行長制限） |
 | 並列アクセス | MCP Clientから複数の同時リクエストが来た場合のシリアル通信の排他制御 |
 | ポートの固定 | OSによってCOMポート名が変わるため、設定ファイルで指定できるようにする |
