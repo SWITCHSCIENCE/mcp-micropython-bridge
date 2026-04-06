@@ -1,7 +1,7 @@
 [project]
-name = "mcp-esp32"
+name = "mcp-micropython"
 version = "0.1.0"
-description = "MCP bridge server for MicroPython on ESP32 via USB serial"
+description = "MCP bridge server for MicroPython (ESP32, RP2040, etc.) via USB serial"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
@@ -10,12 +10,12 @@ dependencies = [
 ]
 
 [project.scripts]
-mcp-esp32 = "mcp_esp32.server:main"
+mcp-micropython = "mcp_micropython.server:main"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/mcp_esp32"]
+packages = ["src/mcp_micropython"]
 

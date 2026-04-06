@@ -2,10 +2,10 @@
 filesystem.py — ファイルシステム操作ツール
 
 MCP ツール:
-  - esp32_list_files  : ファイル/ディレクトリ一覧
-  - esp32_read_file   : ファイル内容の読み出し
-  - esp32_write_file  : ファイルへの書き込み
-  - esp32_delete_file : ファイルの削除
+  - micropython_list_files  : ファイル/ディレクトリ一覧
+  - micropython_read_file   : ファイル内容の読み出し
+  - micropython_write_file  : ファイルへの書き込み
+  - micropython_delete_file : ファイルの削除
 
 Note: 大容量ファイル転送は現時点で非対応。
       将来的に必要になった場合は分割送信を実装する。
@@ -22,9 +22,9 @@ def register(mcp: FastMCP, manager: SerialManager) -> None:
     """ファイルシステムツールを MCP サーバーに登録する。"""
 
     @mcp.tool()
-    def esp32_list_files(path: str = "/") -> str:
+    def micropython_list_files(path: str = "/") -> str:
         """
-        ESP32 のフラッシュ上のファイル/ディレクトリを一覧表示する。
+        MicroPython ボードのフラッシュ上のファイル/ディレクトリを一覧表示する。
 
         Args:
             path: 一覧表示するディレクトリのパス (デフォルト: "/")
@@ -59,9 +59,9 @@ except Exception as e:
         return output if output else f"{path} は空です。"
 
     @mcp.tool()
-    def esp32_read_file(path: str) -> str:
+    def micropython_read_file(path: str) -> str:
         """
-        ESP32 フラッシュ上のファイルを読み出して返す。
+        MicroPython ボードのフラッシュ上のファイルを読み出して返す。
 
         Args:
             path: 読み出すファイルのパス (例: "/main.py")
@@ -87,9 +87,9 @@ except Exception as e:
         return result.stdout
 
     @mcp.tool()
-    def esp32_write_file(path: str, content: str) -> str:
+    def micropython_write_file(path: str, content: str) -> str:
         """
-        ESP32 フラッシュ上のファイルに内容を書き込む（上書き）。
+        MicroPython ボードのフラッシュ上のファイルに内容を書き込む（上書き）。
 
         Args:
             path: 書き込み先ファイルのパス (例: "/main.py")
@@ -121,9 +121,9 @@ except Exception as e:
         return f"✗ {result.stdout}"
 
     @mcp.tool()
-    def esp32_delete_file(path: str) -> str:
+    def micropython_delete_file(path: str) -> str:
         """
-        ESP32 フラッシュ上のファイルを削除する。
+        MicroPython ボードのフラッシュ上のファイルを削除する。
 
         Args:
             path: 削除するファイルのパス (例: "/test.py")

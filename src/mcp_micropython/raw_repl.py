@@ -6,9 +6,9 @@ MicroPython の Raw REPL モードを使ってコードを送受信する。
 Raw REPL の流れ (mpremote 実装準拠):
   1. Ctrl+C x2 で現在の実行をキャンセル
   2. Ctrl+A でRaw REPLモードに入る
-     ESP32 は "raw REPL; CTRL-B to exit\r\n>" を返す
+     ボードは "raw REPL; CTRL-B to exit\r\n>" を返す
   3. コードを送信し Ctrl+D で実行トリガー
-     ESP32 は "OK" を返してから実行開始
+     ボードは "OK" を返してから実行開始
   4. 実行完了後 stdout\x04stderr\x04> が返ってくる
 """
 

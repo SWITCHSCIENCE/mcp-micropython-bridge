@@ -9,6 +9,6 @@ FastMCP インスタンス (mcp) を公開するためのラッパー。
     uv run mcp dev dev_server.py
 """
 
-from mcp_esp32.server import mcp, _manager, _register_tools
+from mcp_micropython.server import mcp, _manager, _register_tools
 
 _register_tools()

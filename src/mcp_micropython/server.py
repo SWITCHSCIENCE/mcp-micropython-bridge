@@ -2,14 +2,14 @@
 server.py — MCP サーバーエントリポイント
 
 起動方法:
-    uv run mcp-esp32
+    uv run mcp-micropython
 
 Claude Desktop / VSCode Extension の設定:
     {
       "mcpServers": {
-        "esp32": {
+        "micropython": {
           "command": "uv",
-          "args": ["--directory", "<このディレクトリのパス>", "run", "mcp-esp32"]
+          "args": ["--directory", "<このディレクトリのパス>", "run", "mcp-micropython"]
         }
       }
     }
@@ -24,14 +24,14 @@ from .tools import device, execution, filesystem
 
 # MCP サーバーインスタンス
 mcp = FastMCP(
-    name="ESP32 MicroPython Bridge",
+    name="MicroPython Bridge",
     instructions=(
-        "ESP32 上の MicroPython インタープリタを操作するブリッジサーバーです。\n"
+        "MicroPython インタープリタを操作するブリッジサーバーです。\n"
         "操作手順:\n"
-        "1. esp32_list_ports で接続可能なポートを確認する\n"
-        "2. esp32_connect で接続する (例: port='COM3')\n"
-        "3. esp32_exec や esp32_eval でコードを実行する\n"
-        "4. 終了時は esp32_disconnect で切断する"
+        "1. micropython_list_ports で接続可能なポートを確認する\n"
+        "2. micropython_connect で接続する (例: port='COM3')\n"
+        "3. micropython_exec や micropython_eval でコードを実行する\n"
+        "4. 終了時は micropython_disconnect で切断する"
     ),
 )
 

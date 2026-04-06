@@ -1,7 +1,7 @@
 """
 serial_manager.py — シリアルポート管理
 
-ESP32 との USB Serial 接続を管理する。
+MicroPython ボードとの USB Serial 接続を管理する。
 - ポートの列挙
 - 接続 / 切断
 - RawRepl インスタンスの提供
@@ -25,12 +25,12 @@ DEFAULT_TIMEOUT = 1.0  # serial read timeout (serialライブラリ側)
 
 
 class NotConnectedError(Exception):
-    """ESP32 に接続していない状態で操作しようとした場合"""
+    """MicroPython ボードに接続していない状態で操作しようとした場合"""
 
 
 class SerialManager:
     """
-    ESP32 とのシリアル接続を管理するシングルトンライクなクラス。
+    MicroPython ボードとのシリアル接続を管理するシングルトンライクなクラス。
     MCPサーバーのライフサイクルと合わせてインスタンスを1つ保持する。
     """
 
@@ -99,7 +99,7 @@ class SerialManager:
 
     def exec_code(self, code: str, timeout: float = 10.0) -> ReplResult:
         """
-        ESP32 で Python コードを実行し結果を返す。
+        MicroPython ボードで Python コードを実行し結果を返す。
 
         Args:
             code: 実行する Python コード
@@ -152,5 +152,5 @@ class SerialManager:
     def _ensure_connected(self) -> None:
         if not self.is_connected:
             raise NotConnectedError(
-                "ESP32 に接続されていません。esp32_connect ツールで接続してください。"
+                "MicroPython ボードに接続されていません。micropython_connect ツールで接続してください。"
             )

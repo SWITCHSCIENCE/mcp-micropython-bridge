@@ -2,8 +2,8 @@
 execution.py — コード実行ツール
 
 MCP ツール:
-  - esp32_exec : Python コードブロックを実行し stdout/stderr を返す
-  - esp32_eval : 式を評価して結果を返す
+  - micropython_exec : Python コードブロックを実行し stdout/stderr を返す
+  - micropython_eval : 式を評価して結果を返す
 """
 
 from __future__ import annotations
@@ -17,9 +17,9 @@ def register(mcp: FastMCP, manager: SerialManager) -> None:
     """コード実行ツールを MCP サーバーに登録する。"""
 
     @mcp.tool()
-    def esp32_exec(code: str, timeout: int = 10) -> str:
+    def micropython_exec(code: str, timeout: int = 10) -> str:
         """
-        ESP32 の MicroPython インタープリタで Python コードを実行する。
+        MicroPython インタープリタで Python コードを実行する。
         複数行のコードも実行できる。
 
         Args:
@@ -50,9 +50,9 @@ def register(mcp: FastMCP, manager: SerialManager) -> None:
             return "\n".join(parts)
 
     @mcp.tool()
-    def esp32_eval(expression: str) -> str:
+    def micropython_eval(expression: str) -> str:
         """
-        ESP32 の MicroPython で式を評価し、結果を文字列で返す。
+        MicroPython ボードで式を評価し、結果を文字列で返す。
 
         Args:
             expression: 評価する Python 式 (例: "1 + 1", "machine.freq()")

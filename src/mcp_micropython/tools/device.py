@@ -2,11 +2,11 @@
 device.py — 接続管理・デバイス情報ツール
 
 MCP ツール:
-  - esp32_list_ports   : 利用可能なシリアルポート一覧
-  - esp32_connect      : 指定ポートに接続
-  - esp32_disconnect   : 接続を切断
-  - esp32_get_info     : デバイス情報取得 (チップ情報・空きメモリ等)
-  - esp32_reset        : ソフトリセット
+  - micropython_list_ports   : 利用可能なシリアルポート一覧
+  - micropython_connect      : 指定ポートに接続
+  - micropython_disconnect   : 接続を切断
+  - micropython_get_info     : デバイス情報取得 (チップ情報・空きメモリ等)
+  - micropython_reset        : ソフトリセット
 """
 
 from __future__ import annotations
@@ -46,23 +46,23 @@ def register(mcp: FastMCP, manager: SerialManager) -> None:
     """デバイス関連ツールを MCP サーバーに登録する。"""
 
     @mcp.tool()
-    def esp32_list_ports() -> str:
+    def micropython_list_ports() -> str:
         """
         接続可能な USB シリアルポートを一覧表示する。
-        ESP32 を接続した後にこのツールを呼んで COM ポート名を確認してください。
+        MicroPython ボードを接続した後にこのツールを呼んで COM ポート名を確認してください。
         """
         ports = manager.list_ports()
         if not ports:
-            return "シリアルポートが見つかりません。ESP32が接続されているか確認してください。"
+            return "シリアルポートが見つかりません。MicroPython ボードが接続されているか確認してください。"
         lines = ["利用可能なシリアルポート:"]
         for p in ports:
             lines.append(f"  {p['port']} — {p['description']} ({p['hwid']})")
         return "\n".join(lines)
 
     @mcp.tool()
-    def esp32_connect(port: str, baudrate: int = 115200) -> str:
+    def micropython_connect(port: str, baudrate: int = 115200) -> str:
         """
-        指定した COM ポートの ESP32 に接続する。
+        指定した COM ポートの MicroPython ボードに接続する。
 
         Args:
             port: シリアルポート名 (例: "COM3")
@@ -75,17 +75,17 @@ def register(mcp: FastMCP, manager: SerialManager) -> None:
             return f"✗ 接続失敗: {e}"
 
     @mcp.tool()
-    def esp32_disconnect() -> str:
-        """ESP32 のシリアル接続を切断する。"""
+    def micropython_disconnect() -> str:
+        """MicroPython ボードのシリアル接続を切断する。"""
         if not manager.is_connected:
             return "既に切断されています。"
         manager.disconnect()
         return "✓ 接続を切断しました。"
 
     @mcp.tool()
-    def esp32_get_info() -> str:
+    def micropython_get_info() -> str:
         """
-        ESP32 のデバイス情報を取得する。
+        MicroPython ボードのデバイス情報を取得する。
         (MicroPython バージョン・空きメモリ・フラッシュ使用量・CPU周波数 など)
         """
         try:
@@ -97,9 +97,9 @@ def register(mcp: FastMCP, manager: SerialManager) -> None:
             return f"取得失敗: {e}"
 
     @mcp.tool()
-    def esp32_reset() -> str:
+    def micropython_reset() -> str:
         """
-        ESP32 をソフトリセットする (machine.reset() に相当)。
+        MicroPython ボードをソフトリセットする (machine.reset() に相当)。
         リセット後は再接続が必要です。
         """
         try:
@@ -110,6 +110,6 @@ def register(mcp: FastMCP, manager: SerialManager) -> None:
             except Exception:
                 pass
             manager.disconnect()
-            return "✓ リセットしました。再接続するには esp32_connect を使用してください。"
+            return "✓ リセットしました。再接続するには micropython_connect を使用してください。"
         except Exception as e:
             return f"リセット失敗: {e}"
