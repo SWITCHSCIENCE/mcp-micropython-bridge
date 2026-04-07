@@ -22,7 +22,7 @@ def register(mcp: FastMCP) -> None:
         "micropython://guide/recipes",
         name="micropython_guide_recipes",
         title="MicroPython MCP recipes",
-        description="Common task recipes for this MCP server.",
+        description="Common task recipes that prefer HARDWARE.md and board-specific helper APIs.",
         mime_type="text/markdown",
     )
     def recipes() -> str:
@@ -42,7 +42,7 @@ def register(mcp: FastMCP) -> None:
         "micropython://guide/limitations",
         name="micropython_guide_limitations",
         title="MicroPython MCP limitations",
-        description="Known limitations and constraints of this MCP server.",
+        description="Known limitations and constraints of this MCP server and its device access model.",
         mime_type="text/markdown",
     )
     def limitations() -> str:

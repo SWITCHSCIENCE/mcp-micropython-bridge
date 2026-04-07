@@ -20,6 +20,7 @@
 ## Long code execution is unstable
 
 - Break the task into smaller checks.
+- Prefer the documented board API from `HARDWARE.md` over reinitializing buses and pins yourself.
 - Prefer short scripts with explicit output.
 - Avoid large multi-step scripts until the board state is known.
 

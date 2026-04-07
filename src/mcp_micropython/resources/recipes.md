@@ -2,6 +2,14 @@
 
 Use these short recipes as starting points for common tasks.
 
+## Preferred approach
+
+- Treat `HARDWARE.md` as the board-specific guide.
+- Use documented helper modules or board APIs first.
+- If new behavior is needed, add or extend a small reusable helper module instead of leaving a one-off script.
+- After adding a helper, add a one-line usage note to `HARDWARE.md` so future sessions can find it.
+- Only fall back to direct `machine.Pin`, `I2C`, `SPI`, or `UART` access when no supported path is documented.
+
 ## List available ports
 
 1. Run `micropython_list_ports`.
@@ -16,7 +24,7 @@ Use these short recipes as starting points for common tasks.
 
 1. Connect to the board.
 2. Read `micropython://device/HARDWARE.md`.
-3. Use it before assuming wiring, GPIO, or attached peripherals.
+3. Treat it as the source of truth for wiring, GPIO, attached peripherals, and supported helper APIs.
 
 ## Inspect the filesystem
 
@@ -24,16 +32,13 @@ Use these short recipes as starting points for common tasks.
 2. Read `micropython://filesystem/list/root`.
 3. Read specific files with `micropython://filesystem/read/{path}` or `micropython_read_file`.
 
-## Read a temperature sensor
+## Use or add a hardware feature
 
-1. Read `HARDWARE.md` or existing code to identify the sensor and bus.
-2. Use `micropython_eval` for a simple probe or `micropython_exec` for a short read script.
-3. Keep the first check small and explicit.
-
-## Read a light sensor
-
-1. Confirm the sensor model and wiring from `HARDWARE.md` or existing code.
-2. Use a short `micropython_exec` script that only initializes the needed bus and prints one reading.
+1. Read `HARDWARE.md` and inspect the existing device files.
+2. If a supported helper exists, use it.
+3. If not, implement the behavior as a small helper module or extend an existing one.
+4. Verify with a short explicit call.
+5. Add a short `HARDWARE.md` entry that says where the helper lives and shows a one-line example.
 
 ## Recover from a hang
 

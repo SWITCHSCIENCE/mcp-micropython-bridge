@@ -18,4 +18,6 @@
 ## Hardware variability
 
 - GPIO assignments and peripheral availability differ by board.
+- The intended usage model is to document board-specific behavior in `HARDWARE.md` and call supported helper modules or board APIs from there.
+- This workflow works best when agents keep `HARDWARE.md` updated with newly added helper modules and short usage notes.
 - Generic MicroPython examples may still be wrong for a specific board or wiring setup.

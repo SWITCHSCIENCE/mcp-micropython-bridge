@@ -27,11 +27,14 @@ mcp = FastMCP(
     name="MicroPython Bridge",
     instructions="""## MicroPython MCP rules
 
-- Connect first, then inspect the current board state before making changes.
-- Do not assume wiring or attached peripherals until you read `HARDWARE.md` or the existing code.
+- Connect first and inspect the current board state before changing anything.
+- Read `HARDWARE.md` first and treat it as the source of truth for wiring, peripherals, helper modules, and board-specific APIs.
+- Prefer documented helpers over ad-hoc direct hardware access.
+- If new hardware behavior is needed, implement or extend a small reusable helper module instead of leaving a one-off script.
+- After adding a helper, append a brief `HARDWARE.md` note with where it lives and a one-line example call so future sessions can reuse it.
+- Do not assume hardware details without reading `HARDWARE.md` or existing code.
 - Always read `/boot.py` and `/main.py` before modifying them.
-- Do not use writes for investigation; use them only for intentional changes.
-- When the board state is unclear, prefer small checks and avoid large scripts or bulk overwrites.
+- Use writes only for intentional changes; when unsure, prefer small checks and avoid bulk overwrites.
 - Disconnect when appropriate, and assume a reset may require reconnection.
 """,
 )

@@ -5,6 +5,8 @@ MicroPython REPL への MCP ブリッジサーバー。
 Claude Desktop, Codex (VSCode), Copilot (VSCode), Antigravity などの MCP クライアントから、
 USB Serial 経由で MicroPython (ESP32, RP2040, etc.) を操作できます。
 
+`HARDWARE.md` を単なる配線メモではなく、デバイス上の再利用可能な helper module への案内役として育てていく運用を想定しています。たとえばサーボ操作の依頼が来たら、その場限りのコード片で済ませるのではなく、小さなライブラリをデバイス上に作成し、`HARDWARE.md` に 1 行の使い方を追記して、次回以降はその helper を再利用する形を推奨します。
+
 ## セットアップ
 
 ```powershell
