@@ -23,14 +23,14 @@ Use these short recipes as starting points for common tasks.
 ## Read `HARDWARE.md`
 
 1. Connect to the board.
-2. Read `micropython://device/HARDWARE.md`.
+2. Run `micropython_read_hardware_md`.
 3. Treat it as the source of truth for wiring, GPIO, attached peripherals, and supported helper APIs.
 
 ## Inspect the filesystem
 
 1. Connect to the board.
-2. Read `micropython://filesystem/list/root`.
-3. Read specific files with `micropython://filesystem/read/{path}` or `micropython_read_file`.
+2. Run `micropython_list_files` with `path="/"`.
+3. Read specific files with `micropython_read_file`.
 
 ## Use or add a hardware feature
 
