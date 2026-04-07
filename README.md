@@ -84,5 +84,6 @@ ESP32 シリーズは `esptool.py` を利用してコマンドラインからイ
 | `micropython_reset_and_capture` | ボードをリセットして起動ログを取得 |
 | `micropython_list_files` | ファイル一覧 |
 | `micropython_read_file` | ファイル読み出し |
+| `micropython_read_hardware_md` | `/HARDWARE.md` を読み出し |
 | `micropython_write_file` | ファイル書き込み |
 | `micropython_delete_file` | ファイル削除 |

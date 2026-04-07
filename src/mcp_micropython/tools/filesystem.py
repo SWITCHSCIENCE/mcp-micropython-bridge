@@ -1,14 +1,16 @@
 """
-filesystem.py — ファイルシステム操作ツール
+filesystem.py - ファイルシステム関連ツール
 
 MCP ツール:
-  - micropython_list_files  : ファイル/ディレクトリ一覧
-  - micropython_read_file   : ファイル内容の読み出し
-  - micropython_write_file  : ファイルへの書き込み
-  - micropython_delete_file : ファイルの削除
+  - micropython_list_files     : ファイル/ディレクトリ一覧
+  - micropython_read_file      : ファイル内容の読み出し
+  - micropython_read_hardware_md : デバイス上の /HARDWARE.md を読む
+  - micropython_write_file     : ファイルへの書き込み
+  - micropython_delete_file    : ファイルの削除
 
-Note: 大容量ファイル転送は現時点で非対応。
-      将来的に必要になった場合は分割送信を実装する。
+Note:
+    大容量ファイル転送は Raw REPL の制約で失敗する場合がある。
+    数 KB を超える場合は分割転送の検討が必要。
 """
 
 from __future__ import annotations
@@ -17,6 +19,8 @@ from mcp.server.fastmcp import FastMCP
 
 from ..serial_manager import NotConnectedError, SerialManager
 
+HARDWARE_MD_PATH = "/HARDWARE.md"
+
 
 def register(mcp: FastMCP, manager: SerialManager) -> None:
     """ファイルシステムツールを MCP サーバーに登録する。"""
@@ -24,7 +28,7 @@ def register(mcp: FastMCP, manager: SerialManager) -> None:
     @mcp.tool()
     def micropython_list_files(path: str = "/") -> str:
         """
-        MicroPython ボードのフラッシュ上のファイル/ディレクトリを一覧表示する。
+        MicroPython ボードのファイルシステム上のファイル/ディレクトリを一覧表示する。
 
         Args:
             path: 一覧表示するディレクトリのパス (デフォルト: "/")
@@ -49,19 +53,19 @@ except Exception as e:
         try:
             result = manager.exec_code(code, timeout=5.0)
         except NotConnectedError as e:
-            return f"✗ {e}"
+            return f"エラー: {e}"
         except Exception as e:
-            return f"✗ エラー: {e}"
+            return f"エラー: {e}"
 
         if not result.ok:
-            return f"✗ エラー:\n{result.stderr}"
+            return f"エラー:\n{result.stderr}"
         output = result.stdout.strip()
         return output if output else f"{path} は空です。"
 
     @mcp.tool()
     def micropython_read_file(path: str) -> str:
         """
-        MicroPython ボードのフラッシュ上のファイルを読み出して返す。
+        MicroPython ボードのファイルを読み出して返す。
 
         Args:
             path: 読み出すファイルのパス (例: "/main.py")
@@ -76,29 +80,54 @@ except Exception as e:
         try:
             result = manager.exec_code(code, timeout=5.0)
         except NotConnectedError as e:
-            return f"✗ {e}"
+            return f"エラー: {e}"
         except Exception as e:
-            return f"✗ エラー: {e}"
+            return f"エラー: {e}"
 
         if not result.ok:
-            return f"✗ エラー:\n{result.stderr}"
+            return f"エラー:\n{result.stderr}"
         if result.stdout.startswith("ERROR:"):
-            return f"✗ {result.stdout}"
+            return f"エラー: {result.stdout}"
+        return result.stdout
+
+    @mcp.tool()
+    def micropython_read_hardware_md() -> str:
+        """
+        デバイス上の /HARDWARE.md を読み出して返す。
+        GPIO 割り当てや接続部品の前提確認用のショートカット。
+        """
+        code = f"""\
+try:
+    with open({HARDWARE_MD_PATH!r}, 'r') as f:
+        print(f.read(), end='')
+except Exception as e:
+    print(f'ERROR: {{e}}')
+"""
+        try:
+            result = manager.exec_code(code, timeout=5.0)
+        except NotConnectedError as e:
+            return f"エラー: {e}"
+        except Exception as e:
+            return f"エラー: {e}"
+
+        if not result.ok:
+            return f"エラー:\n{result.stderr}"
+        if result.stdout.startswith("ERROR:"):
+            return f"エラー: {result.stdout}"
         return result.stdout
 
     @mcp.tool()
     def micropython_write_file(path: str, content: str) -> str:
         """
-        MicroPython ボードのフラッシュ上のファイルに内容を書き込む（上書き）。
+        MicroPython ボードのファイルに内容を書き込む（上書き）。
 
         Args:
             path: 書き込み先ファイルのパス (例: "/main.py")
             content: 書き込む内容 (テキスト)
 
         Note:
-            大容量ファイル (数 KB 以上) は Raw REPL の制限により失敗する場合がある。
+            大容量ファイル (数 KB 以上) は Raw REPL の制約により失敗する場合がある。
         """
-        # content を repr() でエスケープして安全に埋め込む
         code = f"""\
 try:
     with open({path!r}, 'w') as f:
@@ -110,20 +139,20 @@ except Exception as e:
         try:
             result = manager.exec_code(code, timeout=10.0)
         except NotConnectedError as e:
-            return f"✗ {e}"
+            return f"エラー: {e}"
         except Exception as e:
-            return f"✗ エラー: {e}"
+            return f"エラー: {e}"
 
         if not result.ok:
-            return f"✗ エラー:\n{result.stderr}"
+            return f"エラー:\n{result.stderr}"
         if result.stdout.strip() == "OK":
-            return f"✓ {path} に書き込みました。"
-        return f"✗ {result.stdout}"
+            return f"OK: {path} に書き込みました。"
+        return f"エラー: {result.stdout}"
 
     @mcp.tool()
     def micropython_delete_file(path: str) -> str:
         """
-        MicroPython ボードのフラッシュ上のファイルを削除する。
+        MicroPython ボード上のファイルを削除する。
 
         Args:
             path: 削除するファイルのパス (例: "/test.py")
@@ -139,12 +168,12 @@ except Exception as e:
         try:
             result = manager.exec_code(code, timeout=5.0)
         except NotConnectedError as e:
-            return f"✗ {e}"
+            return f"エラー: {e}"
         except Exception as e:
-            return f"✗ エラー: {e}"
+            return f"エラー: {e}"
 
         if not result.ok:
-            return f"✗ エラー:\n{result.stderr}"
+            return f"エラー:\n{result.stderr}"
         if result.stdout.strip() == "OK":
-            return f"✓ {path} を削除しました。"
-        return f"✗ {result.stdout}"
+            return f"OK: {path} を削除しました。"
+        return f"エラー: {result.stdout}"

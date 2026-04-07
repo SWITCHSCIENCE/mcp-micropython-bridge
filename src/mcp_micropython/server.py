@@ -1,10 +1,10 @@
 """
-server.py — MCP サーバーエントリポイント
+server.py - MCP サーバーエントリポイント
 
 起動方法:
     uv run mcp-micropython
 
-Claude Desktop / VSCode Extension の設定:
+Claude Desktop / VSCode Extension の設定例:
     {
       "mcpServers": {
         "micropython": {
@@ -22,20 +22,19 @@ from mcp.server.fastmcp import FastMCP
 from .serial_manager import SerialManager
 from .tools import device, execution, filesystem
 
-# MCP サーバーインスタンス
 mcp = FastMCP(
     name="MicroPython Bridge",
     instructions=(
         "MicroPython インタープリタを操作するブリッジサーバーです。\n"
-        "操作手順:\n"
-        "1. micropython_list_ports で接続可能なポートを確認する\n"
-        "2. micropython_connect で接続する (例: port='COM3')\n"
-        "3. micropython_exec や micropython_eval でコードを実行する\n"
-        "4. 終了時は micropython_disconnect で切断する"
+        "推奨手順:\n"
+        "1. micropython_list_ports で接続可能なポートを確認\n"
+        "2. micropython_connect で接続 (例: port='COM3')\n"
+        "3. micropython_read_hardware_md を使ってハードウェア構成を確認\n"
+        "4. micropython_exec や micropython_eval でコードを実行\n"
+        "5. 終了時は micropython_disconnect で切断"
     ),
 )
 
-# グローバルなシリアル管理インスタンス（サーバーのライフサイクルと同じ）
 _manager = SerialManager()
 
 
