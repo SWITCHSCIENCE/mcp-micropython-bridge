@@ -19,20 +19,21 @@ from __future__ import annotations
 
 from mcp.server.fastmcp import FastMCP
 
+from . import static_resources
 from .serial_manager import SerialManager
 from .tools import device, execution, filesystem
 
 mcp = FastMCP(
     name="MicroPython Bridge",
-    instructions=(
-        "MicroPython インタープリタを操作するブリッジサーバーです。\n"
-        "推奨手順:\n"
-        "1. micropython_list_ports で接続可能なポートを確認\n"
-        "2. micropython_connect で接続 (例: port='COM3')\n"
-        "3. micropython_read_hardware_md を使ってハードウェア構成を確認\n"
-        "4. micropython_exec や micropython_eval でコードを実行\n"
-        "5. 終了時は micropython_disconnect で切断"
-    ),
+    instructions="""## MicroPython MCP rules
+
+- Connect first, then inspect the current board state before making changes.
+- Do not assume wiring or attached peripherals until you read `HARDWARE.md` or the existing code.
+- Always read `/boot.py` and `/main.py` before modifying them.
+- Do not use writes for investigation; use them only for intentional changes.
+- When the board state is unclear, prefer small checks and avoid large scripts or bulk overwrites.
+- Disconnect when appropriate, and assume a reset may require reconnection.
+""",
 )
 
 _manager = SerialManager()
@@ -40,6 +41,7 @@ _manager = SerialManager()
 
 def _register_tools() -> None:
     """全ツールを MCP サーバーに登録する。"""
+    static_resources.register(mcp)
     device.register(mcp, _manager)
     execution.register(mcp, _manager)
     filesystem.register(mcp, _manager)

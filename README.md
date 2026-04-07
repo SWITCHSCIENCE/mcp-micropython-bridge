@@ -67,6 +67,14 @@ ESP32 シリーズは `esptool.py` を利用してコマンドラインからイ
 }
 ```
 
+## 提供リソース
+
+| リソース | 説明 |
+|---|---|
+| `micropython://guide/recipes` | よくある作業の進め方 |
+| `micropython://guide/troubleshooting` | よくある問題の復旧手順 |
+| `micropython://guide/limitations` | 既知の制約一覧 |
+
 ## 提供ツール
 
 | ツール | 説明 |
