@@ -1,4 +1,4 @@
-# mcp-micropython
+# mcp-micropython-bridge
 
 MicroPython REPL への MCP ブリッジサーバー。
 
@@ -14,7 +14,7 @@ USB Serial 経由で MicroPython (ESP32, RP2040, etc.) を操作できます。
 uv sync
 
 # サーバー起動（動作確認用）
-uv run mcp-micropython
+uv run mcp-micropython-bridge
 ```
 
 ## MicroPython ファームウェアの書き込み
@@ -60,9 +60,9 @@ ESP32 シリーズは `esptool.py` を利用してコマンドラインからイ
       "command": "uv",
       "args": [
         "--directory",
-        "C:\\mcp-micropython",
+        "C:\\mcp-micropython-bridge",
         "run",
-        "mcp-micropython"
+        "mcp-micropython-bridge"
       ]
     }
   }

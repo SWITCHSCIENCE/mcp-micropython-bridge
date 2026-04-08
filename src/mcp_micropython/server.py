@@ -2,14 +2,14 @@
 server.py - MCP サーバーエントリポイント
 
 起動方法:
-    uv run mcp-micropython
+    uv run mcp-micropython-bridge
 
 Claude Desktop / VSCode Extension の設定例:
     {
       "mcpServers": {
         "micropython": {
           "command": "uv",
-          "args": ["--directory", "<このディレクトリのパス>", "run", "mcp-micropython"]
+          "args": ["--directory", "<このディレクトリのパス>", "run", "mcp-micropython-bridge"]
         }
       }
     }

@@ -4,9 +4,9 @@
       "command": "uv",
       "args": [
         "--directory",
-        "C:\\mcp-micropython",
+        "C:\\mcp-micropython-bridge",
         "run",
-        "mcp-micropython"
+        "mcp-micropython-bridge"
       ]
     }
   }
