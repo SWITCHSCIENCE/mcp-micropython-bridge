@@ -72,7 +72,7 @@ class RawRepl:
         self._stream.send_bytes(CTRL_A)
         try:
             # "raw REPL; CTRL-B to exit\r\n>" を待つ
-            self._read_until(b">\r\n>", timeout=ENTER_TIMEOUT)
+            self._read_until(b"\r\n>", timeout=ENTER_TIMEOUT)
         except TimeoutError:
             # フォールバック: 一部のファームウェアでは異なる文字列を返す
             pass
