@@ -102,6 +102,7 @@ ESP32 シリーズは `esptool.py` を利用してコマンドラインからイ
 | `micropython_delete_file` | ファイル削除 |
 
 `micropython_exec(timeout=...)` の `timeout` は、コード送信開始から Raw REPL への復帰完了までを含む全体予算として扱います。
+`micropython_read_file` / `micropython_read_hardware_md` / `micropython_write_file` / `micropython_append_file` の `timeout` も同じ意味です。
 
 ## WebREPL 事前設定
 
