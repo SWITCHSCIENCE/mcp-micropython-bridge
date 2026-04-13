@@ -15,7 +15,6 @@ from .tools import device, execution, filesystem
 from .transport import DEFAULT_SERIAL_BAUDRATE, parse_target
 
 DEFAULT_LARGE_FILE_SIZE = 10 * 1024
-DEFAULT_CHUNK_SIZE = 512
 LARGE_FILE_TEST_PATH = "/device_test_cli_large.txt"
 SMALL_FILE_TEST_PATH = "/device_test_cli_small.txt"
 STREAM_READY_SENTINEL = "DEVICE_TEST_STREAM_READY"
@@ -31,10 +30,14 @@ REQUIRED_TOOL_NAMES = {
     "micropython_exec",
     "micropython_eval",
     "micropython_list_files",
+    "micropython_stat_path",
     "micropython_read_file",
     "micropython_write_file",
     "micropython_append_file",
     "micropython_delete_file",
+    "micropython_make_dir",
+    "micropython_remove_dir",
+    "micropython_rename_path",
     "micropython_read_until",
     "micropython_read_stream",
     "micropython_reset",
@@ -50,15 +53,6 @@ def make_test_payload(size: int) -> str:
     seed = "MicroPython large text transfer test payload.\n"
     repeat = (size // len(seed)) + 1
     return (seed * repeat)[:size]
-
-
-def normalize_newlines(text: str) -> str:
-    return text.replace("\r\n", "\n").replace("\r", "\n")
-
-
-def chunk_text(text: str, chunk_size: int = DEFAULT_CHUNK_SIZE) -> list[str]:
-    return [text[offset : offset + chunk_size] for offset in range(0, len(text), chunk_size)]
-
 
 def build_stream_test_main(iterations: int = 30, delay_ms: int = 100) -> str:
     return "\n".join(
@@ -447,35 +441,71 @@ class DeviceTestRunner:
             "read small file",
         )
         expected_small = small_payload + "appended\n"
-        if normalize_newlines(str(read_result.get("content", ""))) == normalize_newlines(expected_small):
+        if str(read_result.get("content", "")) == expected_small:
             self.pass_("read_file", "small file round-trip OK")
         else:
             self.fail("read_file", "small file content mismatch")
 
+        stat_result = self.require_ok(self.call("micropython_stat_path", path=SMALL_FILE_TEST_PATH), "stat small file")
+        if stat_result.get("kind") == "file" and int(stat_result.get("size_bytes") or 0) > 0:
+            self.pass_("stat_path_file", f"bytes={stat_result.get('size_bytes')}")
+        else:
+            self.fail("stat_path_file", f"unexpected stat result: {stat_result!r}")
+
         delete_result = self.require_ok(self.call("micropython_delete_file", path=SMALL_FILE_TEST_PATH), "delete file")
         self.pass_("delete_file", f"path={delete_result.get('path')}")
 
-        payload = make_test_payload(self.args.large_file_size)
-        self.require_ok(
+        dir_result = self.require_ok(
             self.call(
-                "micropython_write_file",
-                path=LARGE_FILE_TEST_PATH,
-                content="",
-                timeout=self.args.exec_timeout,
+                "micropython_make_dir",
+                path="/device_test_cli_dir/nested",
+                parents=True,
+                exist_ok=False,
             ),
-            "initialize large file",
+            "make nested dir",
         )
+        self.pass_("make_dir", f"path={dir_result.get('path')}")
+
+        dir_stat = self.require_ok(
+            self.call("micropython_stat_path", path="/device_test_cli_dir"),
+            "stat dir",
+        )
+        if dir_stat.get("kind") == "dir":
+            self.pass_("stat_path_dir", "directory detected")
+        else:
+            self.fail("stat_path_dir", f"unexpected stat result: {dir_stat!r}")
+
+        rename_result = self.require_ok(
+            self.call(
+                "micropython_rename_path",
+                src="/device_test_cli_dir/nested",
+                dst="/device_test_cli_dir/renamed",
+            ),
+            "rename dir",
+        )
+        self.pass_("rename_path", f"dst={rename_result.get('dst')}")
+
+        self.require_ok(
+            self.call("micropython_remove_dir", path="/device_test_cli_dir/renamed"),
+            "remove renamed dir",
+        )
+        self.require_ok(
+            self.call("micropython_remove_dir", path="/device_test_cli_dir"),
+            "remove base dir",
+        )
+        self.pass_("remove_dir", "directories removed")
+
+        payload = make_test_payload(self.args.large_file_size)
         try:
-            for chunk in chunk_text(payload, DEFAULT_CHUNK_SIZE):
-                self.require_ok(
-                    self.call(
-                        "micropython_append_file",
-                        path=LARGE_FILE_TEST_PATH,
-                        content=chunk,
-                        timeout=self.args.exec_timeout,
-                    ),
-                    "append large file",
-                )
+            large_write = self.require_ok(
+                self.call(
+                    "micropython_write_file",
+                    path=LARGE_FILE_TEST_PATH,
+                    content=payload,
+                    timeout=max(self.args.exec_timeout, 20),
+                ),
+                "write large file",
+            )
             large_read = self.require_ok(
                 self.call(
                     "micropython_read_file",
@@ -485,8 +515,11 @@ class DeviceTestRunner:
                 "read large file",
             )
             restored = str(large_read.get("content", ""))
-            if normalize_newlines(restored) == normalize_newlines(payload):
-                self.pass_("large_file_roundtrip", f"bytes={self.args.large_file_size}")
+            if restored == payload:
+                self.pass_(
+                    "large_file_roundtrip",
+                    f"bytes={large_write.get('bytes_written')}",
+                )
             else:
                 self.fail("large_file_roundtrip", "large file content mismatch")
         finally:

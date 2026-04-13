@@ -37,7 +37,8 @@ Use these short recipes as the default workflow.
 
 1. Connect to the board.
 2. Run `micropython_list_files` with `path="/"`.
-3. Read specific files with `micropython_read_file`.
+3. Run `micropython_stat_path` for a specific file or directory when metadata matters.
+4. Read specific files with `micropython_read_file`.
 
 ## Wait for device output
 

@@ -70,11 +70,15 @@ flowchart LR
 | `micropython_exec` | Pythonコードをブロック実行し結果を返す | `code: str`, `timeout: int` |
 | `micropython_eval` | 式を評価して値を返す | `expression: str` |
 | `micropython_list_files` | ファイルシステム上のファイル一覧 | `path: str = "/"` |
-| `micropython_read_file` | ファイルの内容を読み出す | `path: str` |
+| `micropython_stat_path` | パス情報を読み出す | `path: str` |
+| `micropython_read_file` | ファイルの内容を読み出す | `path: str`, `as_base64: bool = False` |
 | `micropython_read_hardware_md` | `/HARDWARE.md` を読み出す | なし |
-| `micropython_write_file` | ファイルに内容を書き込む | `path: str`, `content: str` |
-| `micropython_append_file` | ファイルに内容を追記する | `path: str`, `content: str` |
+| `micropython_write_file` | ファイルに内容を書き込む | `path: str`, `content: str | None`, `content_base64: str | None` |
+| `micropython_append_file` | ファイルに内容を追記する | `path: str`, `content: str | None`, `content_base64: str | None` |
 | `micropython_delete_file` | ファイルを削除する | `path: str` |
+| `micropython_make_dir` | ディレクトリを作成する | `path: str`, `parents: bool = False`, `exist_ok: bool = False` |
+| `micropython_remove_dir` | 空ディレクトリを削除する | `path: str` |
+| `micropython_rename_path` | パス名を変更する | `src: str`, `dst: str` |
 | `micropython_reset` | ソフトリセット（`machine.reset()`） | なし |
 | `micropython_get_info` | デバイス情報（チップ情報・空きメモリ等）を取得 | なし |
 | `micropython_list_ports` | 利用可能なシリアルポートを列挙する | なし |
@@ -171,8 +175,9 @@ MicroPython REPLには以下の2つのモードがある：
 - [x] `micropython_get_info`: デバイス情報取得
 
 ### Phase 4: ファイルシステムツール
-- [x] `micropython_list_files`
+- [x] `micropython_list_files` / `micropython_stat_path`
 - [x] `micropython_read_file` / `micropython_read_hardware_md` / `micropython_write_file` / `micropython_append_file` / `micropython_delete_file`
+- [x] `micropython_make_dir` / `micropython_remove_dir` / `micropython_rename_path`
 
 ### Phase 5: 品質・UX
 - [ ] タイムアウト・エラーハンドリングの強化
@@ -186,7 +191,7 @@ MicroPython REPLには以下の2つのモードがある：
 | 項目 | 内容 |
 |---|---|
 | 文字コード | MicroPythonボードからのレスポンスはUTF-8だが、バイナリファイルは別対応が必要 |
-| 大きなファイル転送 | `write_file` で初期化し、`append_file` で分割追記する運用が必要（REPLの行長制限） |
+| 大きなファイル転送 | `write_file` が内部で複数チャンク送信する |
 | 並列アクセス | MCP Clientから複数の同時リクエストが来た場合のシリアル通信の排他制御 |
 | ポートの固定 | OSによってCOMポート名が変わるため、設定ファイルで指定できるようにする |
 | Raw REPLの安定性 | 通信エラー時にREPLが壊れた状態になりうる → リセット機構が必要 |
