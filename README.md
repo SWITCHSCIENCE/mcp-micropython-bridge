@@ -98,14 +98,29 @@ ESP32 シリーズは `esptool.py` を利用してコマンドラインからイ
 | `micropython_read_until` | 特定文字列が出るまで待つ |
 | `micropython_reset_and_capture` | ボードをリセットして起動ログを取得（serial 専用） |
 | `micropython_list_files` | ファイル一覧 |
+| `micropython_stat_path` | パス情報取得 |
 | `micropython_read_file` | ファイル読み出し |
+| `micropython_read_lines` | 行単位で一部読み出し |
+| `micropython_head_lines` | 先頭数行を読み出し |
+| `micropython_tail_lines` | 末尾数行を読み出し |
 | `micropython_read_hardware_md` | `/HARDWARE.md` を読み出し |
+| `micropython_upload_file` | ローカルファイルをデバイスへ転送 |
+| `micropython_download_file` | デバイスファイルをローカルへ保存 |
+| `micropython_hash_file` | デバイスファイルの SHA-256 を取得 |
+| `micropython_compare_local_remote` | ローカルとデバイスの一致確認 |
 | `micropython_write_file` | ファイル書き込み |
 | `micropython_append_file` | ファイル追記 |
 | `micropython_delete_file` | ファイル削除 |
+| `micropython_make_dir` | ディレクトリ作成 |
+| `micropython_remove_dir` | 空ディレクトリ削除 |
+| `micropython_rename_path` | パス名変更 |
 
 `micropython_exec(timeout=...)` の `timeout` は、コード送信開始から Raw REPL への復帰完了までを含む全体予算として扱います。
 `micropython_read_file` / `micropython_read_hardware_md` / `micropython_write_file` / `micropython_append_file` の `timeout` も同じ意味です。
+
+`micropython_write_file` は `content` によるテキスト書き込みと `content_base64` によるバイナリ書き込みをサポートします。
+`micropython_append_file` も同じ入出力形式で末尾追記できます。
+`micropython_read_file(as_base64=True)` を使うと、改行コードや非 UTF-8 バイト列を保持したまま取得できます。
 
 ## 実機テスト CLI
 

@@ -31,4 +31,5 @@
 ## Large file writes fail
 
 - Reduce the amount written in one operation.
-- Prefer `micropython_append_file` in small chunks instead of one large overwrite.
+- `micropython_write_file` already splits data into smaller chunks internally.
+- If text decoding fails or exact bytes matter, use `micropython_read_file(as_base64=True)` and `micropython_write_file(content_base64=...)`.

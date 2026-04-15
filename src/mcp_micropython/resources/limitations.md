@@ -13,7 +13,8 @@
 ## File transfer constraints
 
 - Large text writes may fail because of Raw REPL and transport limits.
-- Prefer `micropython_write_file` for the initial write and `micropython_append_file` for small follow-up chunks.
+- Prefer `micropython_write_file`; it now sends file data in multiple chunks internally.
+- Use `content_base64` when exact byte preservation matters.
 - Large binary transfers are not a primary use case.
 
 ## Hardware variability
